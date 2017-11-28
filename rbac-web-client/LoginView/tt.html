@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" >
+
+
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+
+</head>
+
+<body>
+
+<div class="layui-layout layui-layout-admin">
+
+
+    <div class="layui-header">
+        <div class="layui-logo">权限管理系统</div>
+        <!-- 头部区域（可配合layui已有的水平导航） -->
+        <ul id="nav-container" class="layui-nav layui-layout-left" ></ul>
+
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;">
+                    <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+                    江珊
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="">基本资料</a></dd>
+                    <dd><a href="">安全设置</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="">退出</a></li>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed">
+                    <a class="" href="javascript:;">所有商品</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">列表一</a></dd>
+                        <dd><a href="javascript:;">列表二</a></dd>
+                        <dd><a href="javascript:;">列表三</a></dd>
+                        <dd><a href="">超链接</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item">
+                    <a href="javascript:;">解决方案</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;">列表一</a></dd>
+                        <dd><a href="javascript:;">列表二</a></dd>
+                        <dd><a href="">超链接</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item"><a href="">云市场</a></li>
+                <li class="layui-nav-item"><a href="">发布商品</a></li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div style="padding: 15px;">
+            <table id="userTable" lay-filter="test"></table>
+
+        </div>
+
+        <div class="layui-footer">
+            <!-- 底部固定区域 -->
+            我是有底线的！
+        </div>
+    </div>
+
+</div>
+
+<script src="../static/layui.js" charset="utf-8"></script>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-mini" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+<script id="nav" type="text/html">
+    {{# layui.each(d.data, function(index, item){ }}
+    <li class="layui-nav-item"><a href="">{{ item.title }}</a></li>
+    {{#  }); }}
+</script>
+
+
+
+<script type="text/javascript">
+    layui.use(['table', 'form', 'jquery', 'laytpl', 'element'], function (table, form, $, laytpl, element) {
+
+        /* 初始化表格 */
+        var userTable = table.render(
+            {
+
+                elem: '#userTable',  // 原始的table元素
+                height: 500,
+                url: 'http://localhost:8080/rbac-rest-service/rbac/user/profile', // 异步数据的地址
+                page: true,  // 是否分页
+                id: 'userTable',
+
+
+
+                cols: [[{field: 'id', width: 80, sort: true, title: 'ID'},
+                    {field: 'nickName', width: 150, title: '昵称',  edit:'text'},
+                    {field: 'realName', width:150 , title: '真名',  edit:'text'},
+                    {field: 'gender', width: 150, title: '性别',  edit:'text'},
+                    {fixed: 'right', width: 200, align: 'center', toolbar: '#barDemo'}
+
+                ]]
+            });
+
+        /* 监听表单的提交事件
+        data里面有表单的所有数据，访问方式为data.field.表单域的名字
+        */
+        table.on('tool', function (obj) {
+            var data = obj.data;
+
+            /*查看表格信息*/
+            if (obj.event === 'detail') {
+                localStorage['user']=JSON.stringify(obj.data);
+               // location.href="test111.html"
+               func11();
+            }
+
+            /*编辑表格内容*/
+            if (obj.event === 'edit') {
+                layer.confirm('真的要编辑码', function (index,data) {
+                    layer.close(index);
+                    var data = $.extend(obj.data,{_method:'put'});
+                    $.post("http://localhost:8080/rbac-rest-service/rbac/user/profile",data,
+                        function (obj) {
+                            layer.msg("更新成功");
+                        },
+                        "json");
+                });
+
+            }
+            /*删除一条表格*/
+            if (obj.event === 'del'){
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                    $.post("http://localhost:8080/rbac-rest-service/rbac/user/profile/" + data.id
+                        ,{_method:"delete"}
+                        ,function () {
+                            layer.msg("删除成功");
+                        });
+                });
+            }
+        });
+
+        table.on('edit(test)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            data[field] = value; //更新缓存中的值
+            layer.msg(value);
+        });
+
+        function func11() {
+            layer.open({
+                type: 2,
+                title: false,
+                closeBtn: 1, //不显示关闭按钮
+                shade: false,
+                area: ['500px', '300px'],
+                offset: 'auto', //右下角弹出
+                shift: 2,
+                content: 'test111.html'
+            });
+        }
+
+
+
+        var controller = function () {
+            var container = $("#nav-container")
+            $.ajax({
+                url: "http://localhost:8080/rbac-rest-service/rbac/menu/p/0",
+                // url:"http://localhost:8080/rbac-rest-service/rbac/menuPid/1"
+                success: function (data) {
+//                    alert(data.data[0].title);
+                    laytpl($('#nav').html()).render(data, function (html) {
+                        container.html(html);
+                    });
+//                        container.html('<span style="color: #c00;">' + e.toString() + '</span>');
+                }
+                , dataType: 'json'
+            });
+        };
+        controller();
+
+
+
+    });
+</script>
+</body>
+
+
+</html>

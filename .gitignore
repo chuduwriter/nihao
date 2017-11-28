@@ -1,0 +1,13 @@
+/bin/
+.DS_Store
+.classpath
+.project
+.settings/
+*.class
+/target/
+*.iml
+.idea/
+.idea/libraries/
+/.idea/workspace.xml
+*/target/
+

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.lanqiao.rbac.repository.MenuMapper">
+  <resultMap id="BaseResultMap" type="org.lanqiao.rbac.entity.Menu">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="title" jdbcType="VARCHAR" property="title" />
+    <result column="pid" jdbcType="INTEGER" property="pid" />
+    <result column="url" jdbcType="VARCHAR" property="url" />
+    <result column="state" jdbcType="BIT" property="state" />
+    <result column="is_button" jdbcType="BIT" property="isButton" />
+    <result column="description" jdbcType="VARCHAR" property="description" />
+    <result column="gmt_modified" jdbcType="TIMESTAMP" property="gmtModified" />
+    <result column="gmt_create" jdbcType="TIMESTAMP" property="gmtCreate" />
+  </resultMap>
+
+  <select id="selectByPid" resultMap="BaseResultMap" parameterType="int">
+    select * from rbac_menu
+    where pid=#{pid}
+  </select>
+
+  <select id="findMenuAll" resultMap="BaseResultMap">
+    select * from rbac_menu
+    where pid=#{pid}
+  </select>
+
+
+
+  <select id="selectMenuByUserId" resultMap="BaseResultMap" parameterType="int">
+    select r.id as roleId ,a.account,r.name,e.id ,e.title from rbac_account a
+    left join rbac_user_role ur on a.id=ur.user_id
+    left join rbac_role r on ur.role_id=r.id
+    left join rbac_role_menu rm on rm.role_id=r.id
+    right join (select a.id,a.title  from rbac_menu a left join rbac_menu b on a.id=b.pid where a.pid=0 group by a.id,a.title)e on rm.menu_id=e.id
+    where r.id=#{id}
+    group by r.id,a.account,r.name,e.id,e.title
+
+  </select>
+
+</mapper>

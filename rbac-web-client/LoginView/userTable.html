@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+
+</head>
+
+<body>
+
+
+<table class="layui-hide" id="userTable" lay-filter="user"></table>
+</body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-mini" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+<script type="text/javascript">
+    layui.use(['table', 'form', 'jquery', 'laytpl', 'element'], function (table, form, $, laytpl, element) {
+
+        /* 初始化表格 */
+        var userTable = table.render(
+            {
+
+                elem: '#userTable',  // 原始的table元素
+                height: 500,
+                url: 'http://localhost:8080/rbac-rest-service/rbac/user/profile', // 异步数据的地址
+                page: true,  // 是否分页
+                id: 'userTable',
+
+
+
+                cols: [[{field: 'id', width: 80, sort: true, title: 'ID'},
+                    {field: 'nickName', width: 150, title: '昵称',  edit:'text'},
+                    {field: 'realName', width:150 , title: '真名',  edit:'text'},
+                    {field: 'gender', width: 150, title: '性别',  edit:'text'},
+                    {fixed: 'right', width: 200, align: 'center', toolbar: '#barDemo'}
+
+                ]]
+            });
+
+        /* 监听表单的提交事件
+        data里面有表单的所有数据，访问方式为data.field.表单域的名字
+        */
+        table.on('tool', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'detail') {
+                localStorage['user']=JSON.stringify(obj.data);
+                layer.open({
+                    type: 2,
+                    title: false,
+                    closeBtn: 1, //不显示关闭按钮
+
+                    area: ['500px', '300px'],
+                    offset: 'auto', //右下角弹出
+                    shift: 2,
+                    content: 'test111.html'
+                });
+            }
+
+            if (obj.event === 'edit') {
+                layer.confirm('真的要编辑码', function (index,data) {
+                    layer.close(index);
+                    var data =$.extend(obj.data,{_method:'put'});
+                    $.post("http://localhost:8080/rbac-rest-service/rbac/user/profile",data,
+                        function (obj) {
+                            layer.msg("更新成功");
+                        },
+                        "json");
+                });
+
+            }
+
+            if (obj.event === 'del'){
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                    $.post("http://localhost:8080/rbac-rest-service/rbac/user/profile/" + data.id
+                        ,{_method:"delete"}
+                        ,function () {
+                            layer.msg("删除成功");
+                        });
+                });
+            }
+        });
+
+        table.on('edit(test)', function(obj){
+            var value = obj.value //得到修改后的值
+                ,data = obj.data //得到所在行所有键值
+                ,field = obj.field; //得到字段
+            data[field] = value; //更新缓存中的值
+            layer.msg(value);
+        });
+
+        function func11() {
+            layer.open({
+                type: 2,
+                title: false,
+                closeBtn: 1, //不显示关闭按钮
+                shade: false,
+                area: ['500px', '300px'],
+                offset: 'auto', //右下角弹出
+                shift: 2,
+                content: 'test111.html'
+            });
+        }
+
+
+
+
+
+    });
+</script>
+
+</html>

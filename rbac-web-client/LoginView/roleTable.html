@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+
+    <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
+</head>
+<body>
+<br><br>
+
+<div class="layui-btn-group" >
+    <button class="layui-btn layui-btn-small" lay-submit lay-filter="addRole">
+        <i class="layui-icon">&#xe654;</i>
+    </button>
+
+</div>
+<div>
+    <table class="layui-hide" id="userTable" lay-filter="user"></table>
+</div>
+
+
+</body>
+
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-mini" lay-event="addMenu">分配权限</a>
+    <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+</script>
+
+
+<script type="text/javascript">
+    layui.use(['table', 'form', 'jquery','element'], function (table, form, $,elemnt) {
+
+        var userTable = table.render(
+            {
+
+                elem: '#userTable',  // 原始的table元素
+                height: 500,
+                url: 'http://localhost:8080/rbac-rest-service/rbac/role', // 异步数据的地址
+                page: true,  // 是否分页
+                id: 'userTable',
+                cols: [[{field: 'id', width: 80, sort: true, title: 'ID'},
+                    {field: 'name', width: 200, title: '角色名称'},
+                    {field: 'gmtCreate', width:300 , title: '创建角色时间'},
+                    {field: 'description', width: 300, title: '角色描述'},
+                    {fixed: 'right', width: 200, align: 'center', toolbar: '#barDemo'}
+
+                ]]
+            });
+        table.on('tool', function (obj) {
+            var data = obj.data;
+
+            if (obj.event === 'edit') {
+                sessionStorage['role']=JSON.stringify(obj.data);
+                // location.href="test111.html"
+                func11();
+
+            }
+            if (obj.event === 'del'){
+                layer.confirm('真的删除行么', function (index) {
+                    obj.del();
+                    layer.close(index);
+                    $.post("http://localhost:8080/rbac-rest-service/rbac/role/" + data.id
+                        ,{_method:"delete"}
+                        ,function () {
+                            layer.msg("删除成功");
+
+                        });
+                });
+            }
+
+            if (obj.event === 'addMenu') {
+                sessionStorage['allroleSelect']=JSON.stringify(obj.data);
+                layer.open({
+                    type: 2,
+                    title: false,
+                    fixed:false,
+                    closeBtn: 1,
+                    area: ['500px', '300px'],
+                    offset: 'auto', //右下角弹出
+                    content: 'AllRoleSelect.html'
+                });
+
+            }
+
+        });
+
+        function func11() {
+            layer.open({
+                type: 2,
+                title: false,
+                fixed:false,
+                closeBtn: 1,
+                area: ['500px', '500px'],
+                offset: 'auto', //右下角弹出
+                content: 'updataRole.html'
+            });
+        }
+    });
+</script>
+
+<script>
+    //Demo
+    layui.use('form', function(){
+        var form = layui.form;
+
+        //监听提交
+        form.on('submit(addRole)', function(data){
+            layer.open({
+                type: 2,
+                title: false,
+                fixed:false,
+                closeBtn: 1,
+                area: ['500px', '500px'],
+                offset: 'auto', //右下角弹出
+                content: 'inserNewRole.html'
+            });
+        });
+    });
+</script>
+</html>

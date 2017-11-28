@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../static/layui.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+</head>
+<body>
+<br>
+<br>
+<br>
+<form class="layui-form" action="" lay-filter="menu" id="menu">
+
+
+    <div class="layui-form-item">
+        <label class="layui-form-label" >选择添加父菜单</label>
+        <div class="layui-input-block" id="nav-checkbox" >
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label" >选择添加子菜单</label>
+        <div class="layui-input-block" id="nav-checkbox1" >
+        </div>
+    </div>
+
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+</body>
+
+<script id="nav" type="text/html">
+        {{# layui.each(d.data, function(index, item){ }}
+        <input type="checkbox"  name="menuId" value={{item.id}} title={{item.title}} lay-filter="filter1")>
+        {{#  }); }}
+</script>
+<script id="nav1" type="text/html">
+    {{# layui.each(d.data, function(index, item){ }}
+    <input type="checkbox" name="menuId" value={{item.id}} title={{item.title}} lay-filter="filter">
+    {{#  }); }}
+</script>
+
+<script type="text/javascript">
+    layui.use(['form', 'jquery', 'laytpl'], function (form, $, laytpl) {
+        var controller = function () {
+            var container = $("#nav-checkbox");
+            $.ajax({
+                url: "http://localhost:8080/rbac-rest-service/rbac/menu/p/0",
+                success: function (data) {
+                    laytpl($('#nav').html()).render(data, function (html) {
+                        container.html(html);
+                    });
+                    form.render('checkbox','menu');
+                }
+                , dataType: 'json'
+            });
+
+        };
+        controller();
+    });
+
+
+
+</script>
+
+<script>
+    layui.use(['form', 'jquery', 'laytpl'], function (form, $, laytpl) {
+    form.on('submit(formDemo)', function(data){
+        var obj = document.getElementsByName("menuId");
+        var check_val = [];
+        var roleId=JSON.parse(sessionStorage['allroleSelect']).id;
+        alert(roleId);
+        for(k in obj){
+            if(obj[k].checked){
+                check_val.push("{"+"roleId:"+roleId+",menuId:"+obj[k].value+"}");
+            }
+
+        }
+        var  param="["+check_val+"]";
+            alert(param);
+            $.ajax({
+                type:"post",
+                url:"http://localhost:8080/rbac-rest-service/rbac/role/menu/roleMenu",
+                dataType:"json",
+                data:param,
+                contentType:"application/json",
+                success:function (jsonDate) {
+                    alert(jsonDate.code);
+                }
+
+            });
+            return false;
+    });
+    });
+</script>
+
+<script>
+    layui.use(['form', 'jquery', 'laytpl'], function (form, $, laytpl) {
+        form.on('checkbox(filter1)', function (data) {
+            if (data.elem.checked) {
+                    getChildMenu(data.value);
+            }
+        });
+    });
+    function getChildMenu(id) {
+            layui.use(['form', 'jquery', 'laytpl'], function (form, $, laytpl) {
+                    var container = $("#nav-checkbox1");
+                    $.ajax({
+                        url: "http://localhost:8080/rbac-rest-service/rbac/menu/p/"+id,
+                        success: function (data) {
+                            laytpl($('#nav1').html()).render(data, function (html) {
+                                container.html(html);
+                            });
+                            form.render('checkbox','menu');
+                        }
+                        , dataType: 'json'
+                    });
+            });
+        }
+
+</script>
+
+
+
+
+</html>

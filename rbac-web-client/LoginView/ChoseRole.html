@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="../static/layui.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+</head>
+<body>
+
+<form class="layui-container layui-form" action="" >
+        <br>
+        <br>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限</label>
+        <div class="layui-input-block" >
+            <input type="radio"  name="Radionname" id="admin" value="1" title="管理员" >
+            <input type="radio" name="Radionname" id="common"  value="2" title="普通用户" >
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+
+</form>
+
+
+</body>
+<script>
+    layui.use(['form','jquery'], function(form,$){
+    //监听提交
+    form.on('submit(formDemo)', function(data){
+        var id=JSON.parse(sessionStorage['userwithrole']).ID;
+        var roleId=JSON.parse(sessionStorage['userwithrole']).ROLEID;
+        alert(id+","+roleId);
+        var dataNew;
+        var radio = document.getElementsByName("Radionname");
+        for (i=0; i<radio.length; i++) {
+            if (radio[i].checked) {
+                dataNew={userId:id,roleId:radio[i].value};
+            }
+        }
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            data:dataNew,
+            url:"http://localhost:8080/rbac-rest-service/rbac/user/role",
+            success:function (jsondata){
+                alert("添加成功"+jsondata.code);
+            }
+        });
+        return false;
+
+    });
+    });
+
+</script>
+</html>

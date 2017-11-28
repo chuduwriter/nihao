@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+</head>
+<body>
+<form class="layui-container layui-form" action="" id="from1"><br/>
+    <br/>
+    <br/>
+    <br/>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">昵称</label>
+        <div class="layui-input-inline">
+            <input type="text" id="nickName" name="nickName" required lay-verify="required"  autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-inline">
+            <input type="text" id="realName" name="realName" required lay-verify="required"  autocomplete="off" class="layui-input" >
+        </div>
+        <div class="layui-form-mid layui-word-aux">请输如实填写</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别</label>
+        <div class="layui-input-block" >
+            <input type="radio"  name="gender" id="man" value="1" title="男" >
+            <input type="radio" name="gender" id="woman"  value="0" title="女" >
+        </div>
+    </div>
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+
+</body>
+<script src="../static/layui.all.js" charset="utf-8"></script>
+
+<script>
+    layui.use(['form','jquery'], function(form,$){
+        document.getElementById("nickName").value=JSON.parse(localStorage['user']).nickName;
+        document.getElementById("realName").value=JSON.parse(localStorage['user']).realName;
+        var gender=JSON.parse(localStorage['user']).gender;
+        if(gender==true){
+            $(".layui-form-radio:first").click();
+        }
+        else if(gender==false) {
+            $(".layui-form-radio:last").click();
+        }
+
+
+
+    });
+
+
+
+
+</script>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="../static/css/layui.css" media="all">
+</head>
+<body>
+                    <form class="layui-container layui-form" action="" >
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">昵称</label>
+                            <div class="layui-input-inline">
+                                <input name="nickName" lay-verify="title" autocomplete="off"  class="layui-input" type="text">
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">真实姓名</label>
+                            <div class="layui-input-inline">
+                                <input name="realName" lay-verify="title" autocomplete="off"  class="layui-input" type="text">
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">请输如实填写</div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">性别</label>
+                            <div class="layui-input-block" >
+                                <input type="radio"  name="gender" id="man" value="true" title="男" >
+                                <input type="radio" name="gender" id="woman"  value="false" title="女" >
+                            </div>
+                        </div>
+
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn" lay-submit lay-filter="formDemo">立即提交</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+
+                    </form>
+
+
+</body>
+<script src="../static/layui.all.js" charset="utf-8"></script>
+<script>
+    layui.use(['form','jquery'], function(form,$){
+        var form = layui.form;
+        form.on('submit(formDemo)', function(data){
+            alert(data.field.nickName);
+            layer.msg(JSON.stringify(data.field));
+            var dd={nickName:data.field.nickName,realName:data.field.realName,gender:data.field.gender};
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                data:dd,
+                url:"http://localhost:8080/rbac-rest-service/rbac/user/profile",
+                success:function (jsondata){
+                    alert("添加成功"+jsondata.code);
+                }
+
+            });
+        return false;
+        });
+        });
+</script>
+<!--<script>
+
+    layui.use(['form','jquery'], function(form,$){
+        var form = layui.form;
+       form.on('submit(formDemo)', function(data){
+            $.ajax({
+                type:"post",
+                dataType:"json",
+                contentType:"application/json",
+                data:JSON.stringify(data.field),
+                url:"http://localhost:8080/rbac-rest-service/rbac/user/profile",
+                success:function (data){
+                  alert("添加成功"+data.realName);
+                }
+
+            });
+            return false;
+        });
+    });
+</script>-->
+</html>
